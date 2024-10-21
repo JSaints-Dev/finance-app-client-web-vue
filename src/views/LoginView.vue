@@ -32,14 +32,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import BaseInput from '@/components/BaseInput.vue'
 import BaseButton from '@/components/BaseButton.vue'
-
-// const BASE_URL = 'https://finance-api-bgor.onrender.com'
-const BASE_URL = 'http://localhost:4000'
+import api from '@/plugins/axios'
 
 const email = ref('')
 const password = ref('')
@@ -50,7 +47,7 @@ const router = useRouter()
 const login = async () => {
   isLoading.value = true
   try {
-    const response = await axios.post(`${BASE_URL}/auth/login`, {
+    const response = await api.post('/auth/login', {
       email: email.value,
       password: password.value,
     })

@@ -7,10 +7,12 @@ import PrimeVue from 'primevue/config'
 
 import App from './App.vue'
 import router from './router'
+import { initializeAxios } from '@/plugins/axios'
 
 const app = createApp(App)
 
-app.use(createPinia())
+const pinia = createPinia()
+app.use(pinia)
 app.use(PrimeVue, {
   theme: {
     preset: Theme,
@@ -23,5 +25,7 @@ app.use(PrimeVue, {
   },
 })
 app.use(router)
+
+initializeAxios(pinia, router)
 
 app.mount('#app')

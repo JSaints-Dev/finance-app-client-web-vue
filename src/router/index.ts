@@ -7,6 +7,7 @@ import {
 } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import LoginView from '@/views/LoginView.vue'
+import PrivateLayout from '@/layouts/PrivateLayout.vue'
 
 function requireAuth(
   to: RouteLocationNormalizedGeneric,
@@ -55,12 +56,18 @@ const router = createRouter({
     },
     {
       path: '/dashboard',
-      name: 'dashboard',
-      component: () => import('../views/DashboardView.vue'),
+      component: PrivateLayout,
       beforeEnter: requireAuth,
       meta: {
         requireAuth: true,
       },
+      children: [
+        {
+          path: '/dashboard',
+          name: 'dashboard',
+          component: () => import('../views/DashboardView.vue'),
+        },
+      ],
     },
     {
       path: '/about',
