@@ -1,6 +1,25 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory,
+  type NavigationGuardNext,
+  type RouteLocationNormalizedGeneric,
+  type RouteLocationNormalizedLoadedGeneric,
+} from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import LoginView from '@/views/LoginView.vue'
+
+function requireAuth(
+  to: RouteLocationNormalizedGeneric,
+  from: RouteLocationNormalizedLoadedGeneric,
+  next: NavigationGuardNext,
+) {
+  const authStore = useAuthStore()
+  if (authStore.isAuthenticated) {
+    next()
+  } else {
+    next({ name: 'login' })
+  }
+}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,6 +51,15 @@ const router = createRouter({
         } else {
           next()
         }
+      },
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: () => import('../views/DashboardView.vue'),
+      beforeEnter: requireAuth,
+      meta: {
+        requireAuth: true,
       },
     },
     {
