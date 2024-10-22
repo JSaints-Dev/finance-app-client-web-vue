@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import api from '@/plugins/axios'
 
-interface BankAccount {
+export interface BankAccount {
   id: string
   name: string
   totalBalance: number

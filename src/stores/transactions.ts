@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import api from '@/plugins/axios'
 
-interface Transaction {
+export interface Transaction {
   id: string
   name: string
   date: string
