@@ -38,7 +38,7 @@ const logout = () => {
         Sair
       </button>
     </aside>
-    <main class="flex-1 p-4">
+    <main class="flex w-full">
       <RouterView />
     </main>
   </div>
