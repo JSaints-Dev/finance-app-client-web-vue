@@ -8,7 +8,7 @@
         v-model="color"
         id="color"
         label="Cor Hexadecimal"
-        type="text"
+        type="color"
       />
       <BaseInput
         v-model="initialBalanceString"
@@ -49,7 +49,7 @@ import BaseButton from '@/components/BaseButton.vue'
 
 const emits = defineEmits(['close', 'add'])
 
-const color = ref('')
+const color = ref('#000000')
 const initialBalance = ref(0)
 const name = ref('')
 const type = ref('CHECKING')
