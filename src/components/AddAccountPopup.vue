@@ -31,6 +31,7 @@
         />
         <BaseButton
           text="Adicionar"
+          :disabled="isLoading"
           @click="addAccount"
           buttonClass="bg-green-700 hover:bg-green-900 text-white px-3 py-2 rounded-md"
         />
@@ -41,7 +42,6 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useBankAccountsStore } from '@/stores/bankAccounts'
 import api from '@/plugins/axios'
 import BaseInput from '@/components/BaseInput.vue'
 import BaseSelect from '@/components/BaseSelect.vue'
@@ -53,6 +53,7 @@ const color = ref('')
 const initialBalance = ref(0)
 const name = ref('')
 const type = ref('CHECKING')
+const isLoading = ref(false)
 
 const initialBalanceString = computed({
   get: () => initialBalance.value.toString(),
@@ -72,6 +73,9 @@ const closePopup = () => {
 }
 
 const addAccount = async () => {
+  if (isLoading.value) return
+  isLoading.value = true
+
   const newAccount = {
     color: color.value,
     initialBalance: initialBalance.value,
@@ -82,17 +86,12 @@ const addAccount = async () => {
   try {
     const response = await api.post('/bank-accounts', newAccount)
     const createdAccount = response.data
-    const bankAccountsStore = useBankAccountsStore()
-    bankAccountsStore.bankAccounts.push({
-      id: createdAccount.id,
-      name: createdAccount.name,
-      totalBalance: createdAccount.initialBalance,
-    })
-    bankAccountsStore.totalBalance += createdAccount.initialBalance
     emits('add', createdAccount)
     closePopup()
   } catch (error) {
     console.error('Failed to add new account', error)
+  } finally {
+    isLoading.value = false
   }
 }
 </script>

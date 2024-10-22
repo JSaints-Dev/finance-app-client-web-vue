@@ -17,7 +17,7 @@
             <BaseButton
               buttonClass="bg-transparent text-black p-1"
               text="Adicionar"
-              @click="showPopup = true"
+              @click="showAddAccountPopup = true"
             />
           </template>
         </div>
@@ -26,9 +26,19 @@
             <div
               v-for="account in bankAccountsStore.bankAccounts"
               :key="account.id"
-              class="bg-white text-black p-4 rounded-lg flex flex-col w-44 flex-shrink-0"
+              class="bg-white text-black p-4 rounded-lg flex flex-col w-44 flex-shrink-0 relative"
+              @mouseover="showDeleteButton(account.id)"
+              @mouseleave="hideDeleteButton(account.id)"
             >
-              <p class="font-semibold">{{ account.name }}</p>
+              <div class="flex justify-between items-center">
+                <p class="font-semibold">{{ account.name }}</p>
+                <BaseButton
+                  v-show="deleteButtonVisible[account.id]"
+                  text="Excluir"
+                  buttonClass="text-red-500 text-sm font-thin"
+                  @click="deleteAccount(account.id)"
+                />
+              </div>
               <p class="text-xl font-bold">
                 {{ formatCurrency(account.totalBalance) }}
               </p>
@@ -42,7 +52,7 @@
               <BaseButton
                 text="Cadastre uma nova conta"
                 buttonClass="text-white hover:border hover:border-white p-2 rounded-lg"
-                @click="showPopup = true"
+                @click="showAddAccountPopup = true"
               />
             </div>
           </template>
@@ -54,7 +64,16 @@
     <div
       class="flex-1 lg:w-1/2 bg-gray-100 p-4 rounded-lg flex flex-col w-full"
     >
-      <h2 class="text-xl font-semibold">Transações</h2>
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold">Transações</h2>
+        <template v-if="bankAccountsStore.bankAccounts.length > 0">
+          <BaseButton
+            buttonClass="bg-transparent text-black p-1 text-sm font-thin"
+            text="Adicionar"
+            @click="showAddTransactionPopup = true"
+          />
+        </template>
+      </div>
       <div class="flex items-center gap-2 my-4 w-full justify-between">
         <button @click="prevMonths" class="text-gray-500">&lt;</button>
         <div class="flex gap-2">
@@ -96,9 +115,14 @@
       </div>
     </div>
     <AddAccountPopup
-      v-if="showPopup"
-      @close="showPopup = false"
-      @add="addAccount"
+      v-if="showAddAccountPopup"
+      @close="showAddAccountPopup = false"
+      @add="handleAddAccount"
+    />
+    <AddTransactionPopup
+      v-if="showAddTransactionPopup"
+      @close="showAddTransactionPopup = false"
+      @add="addTransaction"
     />
   </div>
 </template>
@@ -108,6 +132,8 @@ import { ref } from 'vue'
 import { useDashboard } from '@/composable/useDashboard'
 import BaseButton from '@/components/BaseButton.vue'
 import AddAccountPopup from '@/components/AddAccountPopup.vue'
+import AddTransactionPopup from '@/components/AddTransactionPopup.vue'
+import api from '@/plugins/axios'
 
 const {
   bankAccountsStore,
@@ -122,9 +148,65 @@ const {
   formatDate,
 } = useDashboard()
 
-const showPopup = ref(false)
+const showAddAccountPopup = ref(false)
+const showAddTransactionPopup = ref(false)
+const deleteButtonVisible = ref<{ [key: string]: boolean }>({})
 
-const addAccount = () => {
-  showPopup.value = false
+interface CreatedAccount {
+  id: string
+  name: string
+  initialBalance: number
+}
+
+interface NewTransaction {
+  categoryId: string
+  bankAccountId: string
+  amount: number
+  name: string
+  date: string
+  type: string
+}
+
+const handleAddAccount = (createdAccount: CreatedAccount) => {
+  bankAccountsStore.bankAccounts.push({
+    id: createdAccount.id,
+    name: createdAccount.name,
+    totalBalance: createdAccount.initialBalance,
+  })
+  bankAccountsStore.totalBalance += createdAccount.initialBalance
+}
+
+const addTransaction = async (newTransaction: NewTransaction) => {
+  try {
+    const response = await api.post('/transactions', newTransaction)
+    const createdTransaction = response.data
+    transactionsStore.transactions.push(createdTransaction)
+    showAddTransactionPopup.value = false
+  } catch (error) {
+    console.error('Failed to add new transaction', error)
+  }
+}
+
+const showDeleteButton = (accountId: string) => {
+  deleteButtonVisible.value[accountId] = true
+}
+
+const hideDeleteButton = (accountId: string) => {
+  deleteButtonVisible.value[accountId] = false
+}
+
+const deleteAccount = async (accountId: string) => {
+  try {
+    await api.delete(`/bank-accounts/${accountId}`)
+    bankAccountsStore.bankAccounts = bankAccountsStore.bankAccounts.filter(
+      account => account.id !== accountId,
+    )
+    bankAccountsStore.totalBalance = bankAccountsStore.bankAccounts.reduce(
+      (sum, account) => sum + account.totalBalance,
+      0,
+    )
+  } catch (error) {
+    console.error('Failed to delete account', error)
+  }
 }
 </script>
