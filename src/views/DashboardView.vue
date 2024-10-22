@@ -2,7 +2,7 @@
   <div class="flex flex-col lg:flex-row gap-4 p-4 min-h-screen w-full">
     <!-- Saldo Total e Contas Cadastradas -->
     <div
-      class="flex-1 lg:w-1/2 bg-green-500 text-white p-4 rounded-lg flex flex-col justify-between"
+      class="flex-1 lg:w-1/2 bg-green-600 text-white p-4 rounded-lg flex flex-col justify-between"
     >
       <div class="flex flex-col">
         <h2 class="text-xl">Saldo Total</h2>
@@ -11,19 +11,41 @@
         </p>
       </div>
       <div class="flex flex-col gap-3 max-w-full">
-        <h3 class="text-lg font-semibold">Minhas Contas</h3>
+        <div class="flex items-center justify-between font-thin text-sm">
+          <h3 class="text-lg font-semibold">Minhas Contas</h3>
+          <template v-if="bankAccountsStore.bankAccounts.length > 0">
+            <BaseButton
+              buttonClass="bg-transparent text-black p-1"
+              text="Adicionar"
+              @click="showPopup = true"
+            />
+          </template>
+        </div>
         <div class="flex gap-4 overflow-x-auto max-w-full overflow-hidden">
-          <div
-            v-for="account in bankAccountsStore.bankAccounts"
-            :key="account.id"
-            class="bg-white text-black p-4 rounded-lg flex flex-col w-44 flex-shrink-0"
-          >
-            <p class="font-semibold">{{ account.name }}</p>
-            <p class="text-xl font-bold">
-              {{ formatCurrency(account.totalBalance) }}
-            </p>
-            <p class="text-sm">Saldo Atual</p>
-          </div>
+          <template v-if="bankAccountsStore.bankAccounts.length > 0">
+            <div
+              v-for="account in bankAccountsStore.bankAccounts"
+              :key="account.id"
+              class="bg-white text-black p-4 rounded-lg flex flex-col w-44 flex-shrink-0"
+            >
+              <p class="font-semibold">{{ account.name }}</p>
+              <p class="text-xl font-bold">
+                {{ formatCurrency(account.totalBalance) }}
+              </p>
+              <p class="text-sm">Saldo Atual</p>
+            </div>
+          </template>
+          <template v-else>
+            <div
+              class="flex justify-center items-center w-full h-48 border-2 border-dotted border-white rounded-lg"
+            >
+              <BaseButton
+                text="Cadastre uma nova conta"
+                buttonClass="text-white hover:border hover:border-white p-2 rounded-lg"
+                @click="showPopup = true"
+              />
+            </div>
+          </template>
         </div>
       </div>
     </div>
@@ -73,11 +95,19 @@
         </div>
       </div>
     </div>
+    <AddAccountPopup
+      v-if="showPopup"
+      @close="showPopup = false"
+      @add="addAccount"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useDashboard } from '@/composable/useDashboard'
+import BaseButton from '@/components/BaseButton.vue'
+import AddAccountPopup from '@/components/AddAccountPopup.vue'
 
 const {
   bankAccountsStore,
@@ -91,4 +121,10 @@ const {
   formatCurrency,
   formatDate,
 } = useDashboard()
+
+const showPopup = ref(false)
+
+const addAccount = () => {
+  showPopup.value = false
+}
 </script>

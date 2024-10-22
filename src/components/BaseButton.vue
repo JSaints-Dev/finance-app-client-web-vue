@@ -26,7 +26,7 @@ const props = defineProps({
   buttonClass: {
     type: String,
     default:
-      'w-full px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 flex items-center justify-center gap-2',
+      'w-full px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 flex items-center justify-center gap-2 hover:border hover:border-white',
   },
   isLoading: {
     type: Boolean,

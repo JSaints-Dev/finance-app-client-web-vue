@@ -3,15 +3,22 @@
     <label :for="id" class="text-sm font-medium text-gray-700">{{
       label
     }}</label>
-    <input
+    <select
       :id="id"
-      :type="type"
       v-model="localValue"
       :class="inputClass"
       :disabled="disabled"
       :required="required"
-      @input="updateValue"
-    />
+      @change="updateValue"
+    >
+      <option
+        v-for="option in options"
+        :key="option.value"
+        :value="option.value"
+      >
+        {{ option.label }}
+      </option>
+    </select>
   </div>
 </template>
 
@@ -19,13 +26,13 @@
 import { defineProps, defineEmits, ref, watch } from 'vue'
 
 const props = defineProps({
-  modelValue: [String, Number],
+  modelValue: String,
   id: String,
-  type: {
-    type: String,
-    default: 'text',
-  },
   label: String,
+  options: {
+    type: Array as () => { value: string; label: string }[],
+    required: true,
+  },
   inputClass: {
     type: String,
     default:
@@ -47,7 +54,7 @@ watch(
 )
 
 const updateValue = (event: Event) => {
-  const target = event.target as HTMLInputElement
+  const target = event.target as HTMLSelectElement
   if (target) {
     emits('update:modelValue', target.value)
   }
