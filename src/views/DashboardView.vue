@@ -173,6 +173,7 @@ const handleAddTransaction = () => {
     selectedMonth.value,
     new Date().getFullYear(),
   )
+  bankAccountsStore.fetchBankAccounts()
 }
 
 const showDeleteButton = (accountId: string) => {
