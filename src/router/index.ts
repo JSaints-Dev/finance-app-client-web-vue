@@ -32,7 +32,7 @@ const router = createRouter({
         const authStore = useAuthStore()
         if (authStore.isAuthenticated) {
           return {
-            name: 'dashboard',
+            name: 'auth/dashboard',
           }
         } else {
           return {
@@ -48,14 +48,14 @@ const router = createRouter({
       beforeEnter: (to, from, next) => {
         const authStore = useAuthStore()
         if (authStore.isAuthenticated) {
-          next({ name: 'dashboard' })
+          next({ path: 'auth/dashboard' })
         } else {
           next()
         }
       },
     },
     {
-      path: '/dashboard',
+      path: '/auth',
       component: PrivateLayout,
       beforeEnter: requireAuth,
       meta: {
@@ -63,9 +63,12 @@ const router = createRouter({
       },
       children: [
         {
-          path: '/dashboard',
-          name: 'dashboard',
+          path: 'dashboard',
           component: () => import('../views/DashboardView.vue'),
+        },
+        {
+          path: 'profile',
+          component: () => import('../views/ProfileView.vue'),
         },
       ],
     },

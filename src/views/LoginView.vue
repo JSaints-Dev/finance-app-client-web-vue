@@ -52,7 +52,7 @@ const login = async () => {
       password: password.value,
     })
     authStore.setAccessToken(response.data.accessToken)
-    router.push({ name: 'dashboard' })
+    router.push({ path: '/auth/dashboard' })
   } catch (error) {
     console.error('Login failed', error)
   } finally {

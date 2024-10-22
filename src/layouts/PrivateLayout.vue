@@ -20,8 +20,13 @@ const logout = () => {
       <nav>
         <ul>
           <li>
-            <RouterLink to="/dashboard" class="block px-4 py-2"
+            <RouterLink to="/auth/dashboard" class="block px-4 py-2"
               >Dashboard</RouterLink
+            >
+          </li>
+          <li>
+            <RouterLink to="/auth/profile" class="block px-4 py-2"
+              >Perfil</RouterLink
             >
           </li>
         </ul>
