@@ -36,7 +36,7 @@
                   v-show="deleteButtonVisible[account.id]"
                   text="Excluir"
                   buttonClass="text-red-500 text-sm font-thin"
-                  @click="deleteAccount(account.id)"
+                  @click="handleDeleteAccount(account.id)"
                 />
               </div>
               <p class="text-xl font-bold">
@@ -133,7 +133,6 @@ import { useDashboard } from '@/composable/useDashboard'
 import BaseButton from '@/components/BaseButton.vue'
 import AddAccountPopup from '@/components/AddAccountPopup.vue'
 import AddTransactionPopup from '@/components/AddTransactionPopup.vue'
-import api from '@/plugins/axios'
 
 const {
   bankAccountsStore,
@@ -184,15 +183,12 @@ const hideDeleteButton = (accountId: string) => {
   deleteButtonVisible.value[accountId] = false
 }
 
-const deleteAccount = async (accountId: string) => {
+const handleDeleteAccount = async (accountId: string) => {
   try {
-    await api.delete(`/bank-accounts/${accountId}`)
-    bankAccountsStore.bankAccounts = bankAccountsStore.bankAccounts.filter(
-      account => account.id !== accountId,
-    )
-    bankAccountsStore.totalBalance = bankAccountsStore.bankAccounts.reduce(
-      (sum, account) => sum + account.totalBalance,
-      0,
+    await bankAccountsStore.deleteAccount(accountId)
+    transactionsStore.fetchTransactions(
+      selectedMonth.value,
+      new Date().getFullYear(),
     )
   } catch (error) {
     console.error('Failed to delete account', error)

@@ -25,5 +25,19 @@ export const useBankAccountsStore = defineStore('bankAccounts', {
         console.error('Failed to fetch bank accounts', error)
       }
     },
+    async deleteAccount(accountId: string) {
+      try {
+        await api.delete(`/bank-accounts/${accountId}`)
+        this.bankAccounts = this.bankAccounts.filter(
+          account => account.id !== accountId,
+        )
+        this.totalBalance = this.bankAccounts.reduce(
+          (sum, account) => sum + account.totalBalance,
+          0,
+        )
+      } catch (error) {
+        console.error('Failed to delete account', error)
+      }
+    },
   },
 })
