@@ -122,7 +122,7 @@
     <AddTransactionPopup
       v-if="showAddTransactionPopup"
       @close="showAddTransactionPopup = false"
-      @add="addTransaction"
+      @add="handleAddTransaction"
     />
   </div>
 </template>
@@ -156,15 +156,8 @@ interface CreatedAccount {
   id: string
   name: string
   initialBalance: number
-}
-
-interface NewTransaction {
-  categoryId: string
-  bankAccountId: string
-  amount: number
-  name: string
-  date: string
-  type: string
+  color: string
+  type: 'CHECKING' | 'INVESTMENT' | 'CASH'
 }
 
 const handleAddAccount = (createdAccount: CreatedAccount) => {
@@ -176,15 +169,11 @@ const handleAddAccount = (createdAccount: CreatedAccount) => {
   bankAccountsStore.totalBalance += createdAccount.initialBalance
 }
 
-const addTransaction = async (newTransaction: NewTransaction) => {
-  try {
-    const response = await api.post('/transactions', newTransaction)
-    const createdTransaction = response.data
-    transactionsStore.transactions.push(createdTransaction)
-    showAddTransactionPopup.value = false
-  } catch (error) {
-    console.error('Failed to add new transaction', error)
-  }
+const handleAddTransaction = () => {
+  transactionsStore.fetchTransactions(
+    selectedMonth.value,
+    new Date().getFullYear(),
+  )
 }
 
 const showDeleteButton = (accountId: string) => {
