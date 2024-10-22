@@ -1,10 +1,7 @@
-import './assets/main.css'
-
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import Theme from '@primevue/themes/aura'
 import PrimeVue from 'primevue/config'
-
 import App from './App.vue'
 import router from './router'
 import { initializeAxios } from '@/plugins/axios'
@@ -27,5 +24,17 @@ app.use(PrimeVue, {
 app.use(router)
 
 initializeAxios(pinia, router)
+
+app.config.globalProperties.$filters = {
+  currency(value: number) {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value)
+  },
+  formatDate(value: string) {
+    return new Date(value).toLocaleDateString('pt-BR')
+  },
+}
 
 app.mount('#app')
